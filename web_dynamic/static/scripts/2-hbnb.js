@@ -1,16 +1,30 @@
-// Wait for the document to be fully loaded
-$('document').ready(function () {
-    // Define the URL of the API endpoint
-    const url = 'http://0.0.0.0:5001/api/v1/status/';
+$(document).ready(init);
 
-    // Send a GET request to the API endpoint
-    $.get(url, function (data) {
-        if (data.status === 'OK') {
-            // If the status is "OK," add the class "available" to the element with id "api_status"
-            $('#api_status').addClass('available');
-        } else {
-            // If the status is not "OK," remove the class "available" from the element with id "api_status"
-            $('#api_status').removeClass('available');
-        }
-    });
-});
+const HOST = '0.0.0.0';
+
+function init () {
+  const amenityObj = {};
+  $('.amenities .popover input').change(function () {
+    if ($(this).is(':checked')) {
+      amenityObj[$(this).attr('data-name')] = $(this).attr('data-id');
+    } else if ($(this).is(':not(:checked)')) {
+      delete amenityObj[$(this).attr('data-name')];
+    }
+    const names = Object.keys(amenityObj);
+    $('.amenities h4').text(names.sort().join(', '));
+  });
+
+  apiStatus();
+}
+
+function apiStatus () {
+  const API_URL = `http://${HOST}:5001/api/v1/status/`;
+  $.get(API_URL, (data, textStatus) => {
+    if (textStatus === 'success' && data.status === 'OK') {
+      $('#api_status').addClass('available');
+    } else {
+      $('#api_status').removeClass('available');
+    }
+  });
+}
+
